@@ -48,3 +48,11 @@
         owner: root
         group: root
         mode: '0644'
+
+    - name: Copy profile file for motd
+      ansible.builtin.copy:
+        src: files/dymotd.sh
+        dest: /etc/profile.d/
+        owner: root
+        group: root
+        mode: '0644'
