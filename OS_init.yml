@@ -40,3 +40,11 @@
     - name: Disable SELinux
       ansible.posix.selinux:
         state: disabled
+
+    - name: Copy banner file for sshd
+      ansible.builtin.copy:
+        src: files/ssh/sshd_banner
+        dest: /etc/ssh/
+        owner: root
+        group: root
+        mode: '0644'
