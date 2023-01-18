@@ -1,0 +1,21 @@
+---
+- hosts: all
+
+  tasks:
+  - name: Repo epel-release
+    ansible.builtin.yum:
+       name: epel-release
+       state: latest
+
+  - name: install packages
+    # bash-completion --- bash 补全
+    # htop            --- top 改进版
+    ansible.builtin.yum:
+       name:
+         - bash-completion
+         - htop
+         - net-tools
+         - tar
+         - vim
+         - wget
+       state: latest

@@ -1,0 +1,25 @@
+---
+- hosts: all
+
+  tasks:
+  - name: update cache for Yum
+    ansible.builtin.yum:
+       update_cache: yes
+    when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis OS"
+
+  - name: update cache for apt
+    ansible.builtin.apt:
+       update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: update all packages for CentOS | XCP-ng | Anolis OS
+    ansible.builtin.yum:
+       name: '*'
+       state: latest
+    when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis OS"
+
+  - name: Update all packages for Ubuntu
+    ansible.builtin.apt:
+       name: "*"
+       state: latest
+    when: ansible_distribution == "Ubuntu"
