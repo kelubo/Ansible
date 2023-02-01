@@ -2,25 +2,27 @@
 - hosts: all
 
   tasks:
-  - name: update cache for Yum
-    ansible.builtin.yum:
-       update_cache: yes
-    when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis OS"
+  - name: update cache for Yum && update all packages for CentOS | XCP-ng | Anolis OS
+    block:
+      - name: update cache for Yum
+        ansible.builtin.yum:
+          update_cache: yes
 
-  - name: update cache for apt
-    ansible.builtin.apt:
-       update_cache: yes
-    when: ansible_distribution == "Ubuntu"
-
-  - name: update all packages for CentOS | XCP-ng | Anolis OS
-    ansible.builtin.yum:
-       name: '*'
-       state: latest
-       exclude: containerd.io,docker*,mysql*,elasticsearch,kibana,logstash,metricbeat,openscap,neo4j
+      - name: update all packages for CentOS | XCP-ng | Anolis OS
+        ansible.builtin.yum:
+          name: '*'
+          state: latest
+          exclude: containerd.io,docker*,mysql*,elasticsearch,kibana,logstash,metricbeat,openscap,neo4j  
     when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis OS"
 
-  - name: Update all packages for Ubuntu
-    ansible.builtin.apt:
-       name: "*"
-       state: latest
+  - name: update cache for apt && Update all packages for Ubuntu
+    block:
+      - name: update cache for apt
+        ansible.builtin.apt:
+          update_cache: yes
+
+      - name: Update all packages for Ubuntu
+        ansible.builtin.apt:
+          name: "*"
+          state: latest
     when: ansible_distribution == "Ubuntu"
