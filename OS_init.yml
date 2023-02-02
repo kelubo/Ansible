@@ -5,10 +5,6 @@
     - yum_repo
   
   tasks:
-  
-    - name: update cache
-      ansible.builtin.yum:
-        update_cache: yes
 
     - name: Install software
       # bash-completion --- bash 补全

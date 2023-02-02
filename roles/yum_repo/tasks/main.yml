@@ -4,3 +4,7 @@
   ansible.builtin.yum:
     name: epel-release
     state: latest
+
+- name: update cache
+  ansible.builtin.yum:
+    update_cache: yes
