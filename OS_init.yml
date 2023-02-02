@@ -1,13 +1,11 @@
 ---
 - hosts: INIT
 
+  roles:
+    - yum_repo
+  
   tasks:
   
-    - name: Repo epel-release
-      ansible.builtin.yum:
-        name: epel-release
-        state: latest
-
     - name: update cache
       ansible.builtin.yum:
         update_cache: yes
@@ -23,7 +21,6 @@
           - tar
           - vim
           - wget
-          - bash-completion
         state: latest
 
     - name: upgrade all packages
@@ -37,9 +34,9 @@
         state: stopped
         enabled: no
 
-    - name: Disable SELinux
-      ansible.posix.selinux:
-        state: disabled
+#    - name: Disable SELinux
+#      ansible.posix.selinux:
+#        state: disabled
 
     - name: Copy banner file for sshd
       ansible.builtin.copy:
