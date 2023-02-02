@@ -3,6 +3,7 @@
 
   roles:
     - yum_repo
+    - os_update
   
   tasks:
 
@@ -17,11 +18,6 @@
           - tar
           - vim
           - wget
-        state: latest
-
-    - name: upgrade all packages
-      ansible.builtin.yum:
-        name: '*'
         state: latest
 
     - name: Stop service Firewalld
