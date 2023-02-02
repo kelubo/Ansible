@@ -1,0 +1,6 @@
+---
+
+- name: Repo epel-release
+  ansible.builtin.yum:
+    name: epel-release
+    state: latest
