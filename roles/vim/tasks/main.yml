@@ -1,0 +1,10 @@
+---
+
+- name: Vim Configure file
+  ansible.builtin.copy:
+    src: files/vimrc
+    dest: /root/.vimrc
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes

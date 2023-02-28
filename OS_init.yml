@@ -4,6 +4,7 @@
   roles:
     - yum_repo
     - os_update
+    - vim
   
   tasks:
 

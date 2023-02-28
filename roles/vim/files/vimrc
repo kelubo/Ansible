@@ -1,0 +1,20 @@
+"显示行号
+set number
+
+"设置字体
+set guifont=Lucida_Console:h14:b:cDEFAULT
+
+"设置编码 utf-8
+set encoding=utf-8
+
+"编辑YAML文件,在Tab键按下时,执行一个双空格缩进，并自动缩进后续行。
+autocmd FileType yaml setlocal ai ts=2 sw=2 et
+
+"按下回车键后，下一行的缩进会自动跟上一行的缩进保持一致。
+set autoindent
+
+"光标遇到圆括号、方括号、大括号时，自动高亮对应的另一个圆括号、方括号和大括号。
+set showmatch
+
+"搜索时，高亮显示匹配结果。
+set hlsearch
