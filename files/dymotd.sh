@@ -10,7 +10,7 @@ DISK_USAGE=`df -h / | awk '/\// {print $5}'|grep -v "^$"`
 
 echo "
 =========================================================================================
-- Release.............: `cat /etc/redhat-release`
+- Release.............: `cat /etc/redhat-release || cat /etc/os-release | grep PRETTY_NAME | sed 's/"//g' | awk -F = '{print $2}'`
 - Kernel..............: `uname -r`
 - Hostname............: `uname -n`
 - Username............: `whoami`
