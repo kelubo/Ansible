@@ -2,15 +2,15 @@
 
 - name: Update Yum_Repo configuration for CentOS-Stream-release-8
   ansible.builtin.template:
-    src: templates/CentOS-Stream-{{item.yumrepo}}.repo.j2
-    dest: /etc/yum.repos.d/CentOS-Stream-{{item.yumrepo}}.repo
-    with_items:
-      - AppStream
-      - BaseOS
-      - Extras-common
-      - Extras
+    src: CentOS-Stream-release-8/CentOS-Stream-{{item}}.repo.j2
+    dest: /etc/yum.repos.d/CentOS-Stream-{{item}}.repo
     owner: root
     group: root
     mode: '0644'
     backup: yes
+  with_items:
+    - AppStream
+    - BaseOS
+    - Extras-common
+    - Extras
   when: ansible_distribution == "CentOS" and ansible_distribution_release == "Stream" and ansible_distribution_major_version == "8"    
