@@ -1,0 +1,13 @@
+---
+
+- name: SSH session timeout 
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp_string }}"
+    line: "{{ item.rule }}"
+  with_items:
+    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval 600" }
+    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax 3" }
+  notify:
+      restart sshd
+        
