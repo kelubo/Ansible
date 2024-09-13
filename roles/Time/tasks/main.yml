@@ -1,0 +1,9 @@
+---
+
+- name: Set Timezone
+  community.general.timezone:
+    name: Asia/Shanghai
+
+#- name: Crond restart
+
+
