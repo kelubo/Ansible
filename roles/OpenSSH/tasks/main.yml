@@ -1,13 +1,25 @@
 ---
 
-- name: SSH session timeout 
-  lineinfile:
+- name: SSH session timeout - CentOS
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp_string }}"
     line: "{{ item.rule }}"
   with_items:
     - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval 600" }
     - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax 3" }
+  when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
   notify:
-      restart sshd
-        
+    - restart sshd
+
+- name: SSH session timeout - Ubuntu
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp_string }}"
+    line: "{{ item.rule }}"
+  with_items:
+    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval 600" }
+    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax 3" }
+  when: ansible_distribution == "Ubuntu"
+  notify:
+     - restart ssh
