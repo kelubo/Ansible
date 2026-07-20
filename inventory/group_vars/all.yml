@@ -1,0 +1,44 @@
+---
+# ============================================
+# 全局变量配置 - 适用于所有主机
+# ============================================
+
+# ---------------------------
+# 时区配置
+# ---------------------------
+# 系统时区，遵循 IANA 时区数据库格式
+# 可在 group_vars 或 host_vars 中覆盖
+timezone: Asia/Shanghai
+
+# ---------------------------
+# YUM 仓库配置
+# ---------------------------
+# 内部 YUM 源地址，用于内网环境下的软件安装和更新
+# 变量名对应 roles/yum_repo/templates/*.repo.j2 模板中的 {{ local_yum_repo_url }}
+local_yum_repo_url: "http://192.168.1.52:8081/repository/Yum_CentOS"
+
+# ---------------------------
+# 通用软件包列表
+# ---------------------------
+# 服务器初始化时安装的基础软件包
+# 变量名对应 playbooks/OS_init.yml 中的 {{ common_packages }}
+common_packages:
+  - bash-completion  # Bash 命令补全
+  - htop            # 系统资源监控工具（top 改进版）
+  - net-tools       # 网络工具（ifconfig, netstat 等）
+  - tar             # 压缩解压工具
+  - vim             # 文本编辑器
+  - wget            # 下载工具
+  - git             # 版本控制工具
+  - curl            # URL 请求工具
+
+# ---------------------------
+# SSH 会话超时配置
+# ---------------------------
+# 变量名对应 roles/OpenSSH/tasks/main.yml 中的 {{ ssh_timeout.* }}
+# client_alive_interval: 服务器向客户端发送保活消息的间隔（秒）
+# client_alive_count_max: 服务器发送保活消息后无响应的最大次数
+# 实际超时时间 = client_alive_interval * client_alive_count_max = 600 * 3 = 1800秒 = 30分钟
+ssh_timeout:
+  client_alive_interval: 600      # 10分钟发送一次保活消息
+  client_alive_count_max: 3        # 连续3次无响应则断开连接

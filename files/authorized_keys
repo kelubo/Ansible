@@ -1,1 +1,15 @@
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDPQ+w0vbLVf2wbCkrNzAG3C7Ya3ahRM1GRV6SD+febO5OVIb5r/wxRblqFHMyWlGvX1OwNsgEpqW04VoEXPain5xzkfLklLRI9QIYZ8JZPGlbO4OBnIdSVyiqZF9hKhnhN8BBXQEkFd5LWzo8K5ezaWB273gH3dW2xWHOx5v0/pIDqNQplJBN9THzXllMPsBVsBy9v75xG+NrIgiCRfyptjPHFXb0aQetP0m5RL/Zx8xEItouvYZI4QFutNPFM7RfrELflycx1a+gfN8P7RWhkq4Isj3rd2S0F5+bLHyVurlewvVOeqtV4lVVxyYtbzFMhOi7YFDJmdKt54PTagMUp  ansible
+# ============================================
+# SSH 公钥文件
+# ============================================
+# 此文件用于存放授权用户的 SSH 公钥
+# 部署到服务器后，拥有对应私钥的用户可以免密码登录
+
+# 格式：<key_type> <public_key> <comment>
+# 示例：
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ... username@hostname
+
+# 注意：
+# 1. 添加公钥前请确保该用户已获得授权
+# 2. 公钥文件权限必须设置为 600
+# 3. 目录权限必须设置为 700
+# 4. 建议为每个用户使用独立的密钥对

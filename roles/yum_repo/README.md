@@ -7,4 +7,4 @@
 * CentOS Stream 8
 * a
 
-需要修改 `vars/main.yml` 文件中的 `Local_YumRepo_URL` 变量为内部 Yum 源服务器地址。
+需要修改 `vars/main.yml` 文件中的 `local_yum_repo_url` 变量为内部 Yum 源服务器地址。

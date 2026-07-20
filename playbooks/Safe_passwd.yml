@@ -1,0 +1,55 @@
+---
+# ============================================
+# 密码安全配置 Playbook
+# ============================================
+# 配置密码过期策略和密码复杂度要求
+# 适用于 CentOS 7 系统
+#
+# 配置内容：
+# 1. 密码过期策略：90天过期
+# 2. 密码质量要求：
+#    - 最小长度：8位
+#    - 至少包含1个数字
+#    - 至少包含1个小写字母
+#    - 至少包含1个特殊字符
+#    - 至少包含1个大写字母
+
+- hosts: all
+
+  tasks:
+    # ---------------------------
+    # 配置密码过期时间
+    # ---------------------------
+    # 修改 /etc/login.defs 中的 PASS_MAX_DAYS
+    # 设置密码最大有效期为 90 天
+    - name: Set password expiration to 90 days
+      lineinfile:
+        path: /etc/login.defs
+        regexp: "{{ item.regexp_string }}"
+        line: "{{ item.rule }}"
+      with_items:
+        - { regexp_string: "^PASS_MAX_DAYS", rule: "PASS_MAX_DAYS   90"}
+      when: ansible_distribution_major_version == "7"
+
+    # ---------------------------
+    # 配置密码质量要求
+    # ---------------------------
+    # 修改 /etc/security/pwquality.conf
+    # pwquality 配置说明：
+    # - minlen = 8: 密码最小长度为8位
+    # - dcredit = -1: 至少包含1个数字（负数表示必须包含）
+    # - lcredit = -1: 至少包含1个小写字母
+    # - ocredit = -1: 至少包含1个特殊字符
+    # - ucredit = -1: 至少包含1个大写字母
+    - name: Configure password quality requirements
+      lineinfile:
+        path: /etc/security/pwquality.conf
+        regexp: "{{ item.regexp_string }}"
+        line: "{{ item.rule }}"
+      with_items:
+        - { regexp_string: "minlen", rule: "minlen = 8"}
+        - { regexp_string: "dcredit", rule: "dcredit = -1"}
+        - { regexp_string: "lcredit", rule: "lcredit = -1"}
+        - { regexp_string: "ocredit", rule: "ocredit = -1"}
+        - { regexp_string: "ucredit", rule: "ucredit = -1"}
+      when: ansible_distribution_major_version == "7"

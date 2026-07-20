@@ -1,0 +1,37 @@
+---
+# ============================================
+# 登录安全配置 Playbook
+# ============================================
+# 防止暴力破解攻击，配置 PAM 认证失败锁定
+# 适用于 CentOS 7 系统（CentOS 8+ 使用 pam_faillock 替代 pam_tally2）
+#
+# pam_tally2 配置说明：
+# - deny=3: 连续失败3次后锁定账户
+# - unlock_time=300: 普通用户锁定5分钟（300秒）后自动解锁
+# - even_deny_root: 同样限制 root 用户
+# - root_unlock_time=300: root 用户锁定5分钟后自动解锁
+
+- hosts: all
+
+  tasks:
+    # ---------------------------
+    # 系统认证层面防暴力破解
+    # ---------------------------
+    # 修改 /etc/pam.d/system-auth-ac，影响所有本地登录方式
+    - name: Configure PAM for system authentication (CentOS 7)
+      lineinfile:
+        path: /etc/pam.d/system-auth-ac
+        insertbefore: "auth        required      pam_env.so"
+        line: "auth        required      pam_tally2.so deny=3 unlock_time=300 even_deny_root root_unlock_time=300"
+      when: ansible_distribution_major_version == "7"
+
+    # ---------------------------
+    # SSH 认证层面防暴力破解
+    # ---------------------------
+    # 修改 /etc/pam.d/sshd，仅影响 SSH 登录
+    - name: Configure PAM for SSH authentication (CentOS 7)
+      lineinfile:
+        path: /etc/pam.d/sshd
+        insertafter: "#%PAM-1.0"
+        line: "auth       required     pam_tally2.so deny=3 unlock_time=300 even_deny_root root_unlock_time=300"
+      when: ansible_distribution_major_version == "7"

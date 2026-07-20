@@ -1,0 +1,29 @@
+---
+# ============================================
+# SSH 公钥部署 Playbook
+# ============================================
+# 将 Ansible 控制节点的 SSH 公钥部署到所有受管主机
+# 实现无密码登录，方便后续 Ansible 自动化操作
+#
+# 使用方法：
+#   ansible-playbook -i inventory/production.ini playbooks/ssh_key.yml --ask-pass
+#
+# --ask-pass 参数说明：
+#   首次部署公钥时需要输入目标主机的 root 密码
+#   部署完成后后续操作无需密码
+
+- name: Deploy SSH public key to managed hosts
+  hosts: all
+
+  tasks:
+    # ---------------------------
+    # 部署 SSH 公钥
+    # ---------------------------
+    # 将控制节点的 ~/.ssh/id_rsa.pub 公钥添加到目标主机 root 用户的 authorized_keys
+    - name: Add SSH public key to root's authorized_keys
+      authorized_key:
+        user: root              # 目标用户
+        state: present          # 确保密钥存在
+        key: '{{ item }}'       # 密钥内容
+      with_file:
+        - ~/.ssh/id_rsa.pub     # 本地公钥文件路径

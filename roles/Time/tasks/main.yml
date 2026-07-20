@@ -1,9 +1,18 @@
 ---
+# ============================================
+# 时区配置任务
+# ============================================
+# 使用 community.general.timezone 模块设置系统时区
+# 变量 timezone 从 inventory/group_vars/all.yml 中读取
+# 时区格式遵循 IANA 时区数据库（如 Asia/Shanghai, Europe/London）
+# 
+# 支持的系统：CentOS, RHEL, Ubuntu, Debian 等
+# 此模块会自动：
+# 1. 设置 /etc/timezone（Debian/Ubuntu）或 /etc/localtime（RHEL/CentOS）
+# 2. 更新系统时间同步
 
 - name: Set Timezone
   community.general.timezone:
-    name: Asia/Shanghai
-
-#- name: Crond restart
+    name: "{{ timezone }}"
 
 

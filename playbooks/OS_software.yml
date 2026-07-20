@@ -1,0 +1,33 @@
+---
+# ============================================
+# 软件安装 Playbook
+# ============================================
+# 安装基础软件包，适用于所有主机
+# 包含 EPEL 仓库配置和常用工具安装
+
+- hosts: all
+
+  tasks:
+    # ---------------------------
+    # 安装 EPEL 仓库
+    # ---------------------------
+    # Extra Packages for Enterprise Linux
+    # 提供 CentOS/RHEL 默认仓库中没有的额外软件包
+    - name: Install EPEL repository
+      ansible.builtin.yum:
+        name: epel-release
+        state: latest
+
+    # ---------------------------
+    # 安装常用工具包
+    # ---------------------------
+    - name: Install common utility packages
+      ansible.builtin.yum:
+        name:
+          - bash-completion    # Bash 命令补全
+          - htop               # 系统资源监控工具（top 改进版）
+          - net-tools          # 网络工具（ifconfig, netstat 等）
+          - tar                # 压缩解压工具
+          - vim                # 文本编辑器
+          - wget               # 下载工具
+        state: latest

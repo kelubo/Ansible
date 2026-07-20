@@ -1,0 +1,64 @@
+---
+# ============================================
+# Apache HTTP Server 配置 Playbook
+# ============================================
+# 安装并配置 Apache Web 服务器
+# 适用于 web 主机组
+#
+# 配置内容：
+# 1. 安装 httpd 包
+# 2. 部署自定义 httpd.conf 配置文件
+# 3. 部署默认 index.html 欢迎页面
+# 4. 确保 Apache 服务启动并运行
+
+- hosts: web
+
+  vars:
+    http_port: 80              # HTTP 服务端口
+    max_clients: 200           # 最大并发连接数
+
+  remote_user: root
+
+  tasks:
+    # ---------------------------
+    # 安装 Apache 服务
+    # ---------------------------
+    - name: Install Apache HTTP Server
+      ansible.builtin.yum:
+        name: httpd
+        state: latest
+
+    # ---------------------------
+    # 部署配置文件
+    # ---------------------------
+    # 使用模板文件 templates/httpd.conf.j2
+    # 配置变更后触发 restart apache handler
+    - name: Deploy Apache configuration file
+      template: 
+        src: templates/httpd.conf.j2 
+        dest: /etc/httpd/conf/httpd.conf
+      notify:
+        - restart apache
+
+    # ---------------------------
+    # 部署默认首页
+    # ---------------------------
+    # 使用模板文件 templates/index.html.j2
+    - name: Deploy default index.html page
+      template: 
+        src: templates/index.html.j2 
+        dest: /var/www/html/index.html
+
+    # ---------------------------
+    # 启动 Apache 服务
+    # ---------------------------
+    - name: Ensure Apache is running and enabled
+      service: 
+        name: httpd 
+        state: started
+        enabled: yes
+  
+  handlers:
+    # Apache 配置变更后重启服务
+    - name: restart apache
+      service: name=httpd state=restarted

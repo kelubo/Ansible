@@ -1,0 +1,62 @@
+---
+# ============================================
+# 服务器初始化 Playbook
+# ============================================
+# 适用于新服务器的基础配置，包含以下步骤：
+# 1. 配置 YUM 仓库
+# 2. 系统更新（排除特定软件包）
+# 3. 设置时区
+# 4. 安装 Vim 编辑器配置
+# 5. 安装通用软件包
+# 6. 配置 SSH Banner 和 MOTD
+
+- hosts: INIT
+
+  roles:
+    - yum_repo       # 配置内部 YUM 源（模板变量: {{ local_yum_repo_url }}）
+    - os_update      # 系统更新（排除 docker, mysql, gitlab 等关键服务）
+    - Time           # 设置时区（变量: {{ timezone }}）
+    - vim            # 安装并配置 Vim 编辑器
+  
+  tasks:
+
+    # ---------------------------
+    # 安装通用软件包
+    # ---------------------------
+    # 从 inventory/group_vars/all.yml 中读取 common_packages 变量
+    - name: Install common packages
+      ansible.builtin.yum:
+        name: "{{ common_packages }}"
+        state: latest
+
+    # ---------------------------
+    # 防火墙配置（已注释）
+    # ---------------------------
+    # 根据安全策略决定是否关闭防火墙
+    # 生产环境建议保留防火墙并配置相应规则
+    #- name: Stop service Firewalld
+    #  systemd:
+    #    name: firewalld
+    #    state: stopped
+    #    enabled: no
+
+    # ---------------------------
+    # SELinux 配置（已注释）
+    # ---------------------------
+    # 根据安全策略决定是否禁用 SELinux
+    # 生产环境建议设置为 enforcing 模式
+    #- name: Disable SELinux
+    #  ansible.posix.selinux:
+    #    state: disabled
+
+    # ---------------------------
+    # MOTD（每日消息）配置
+    # ---------------------------
+    # 用户登录后显示的欢迎信息和系统状态
+    - name: Copy profile file for motd
+      ansible.builtin.copy:
+        src: files/dymotd.sh
+        dest: /etc/profile.d/
+        owner: root
+        group: root
+        mode: '0644'

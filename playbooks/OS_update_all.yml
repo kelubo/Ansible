@@ -1,0 +1,45 @@
+---
+# ============================================
+# 全量系统更新 Playbook
+# ============================================
+# 更新所有软件包（不排除任何包）
+# 注意：此 Playbook 会更新所有包，包括 Docker、MySQL、GitLab 等关键服务
+#       生产环境建议使用 OS_update.yml（会排除关键服务包）
+#
+# 适用场景：
+# - 测试环境更新
+# - 新服务器初始化（确认无关键服务时）
+# - 需要强制更新所有包的特殊情况
+
+- hosts: all
+
+  tasks:
+    # ---------------------------
+    # CentOS / XCP-ng / Anolis OS 全量更新
+    # ---------------------------
+    - name: Update all packages for CentOS | XCP-ng | Anolis OS
+      block:
+        - name: Update YUM cache
+          ansible.builtin.yum:
+            update_cache: yes
+
+        - name: Update all packages (no exclusions)
+          ansible.builtin.yum:
+            name: '*'
+            state: latest
+      when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis OS"
+
+    # ---------------------------
+    # Ubuntu 全量更新
+    # ---------------------------
+    - name: Update all packages for Ubuntu
+      block:
+        - name: Update APT cache
+          ansible.builtin.apt:
+            update_cache: yes
+
+        - name: Update all packages (no exclusions)
+          ansible.builtin.apt:
+            name: "*"
+            state: latest
+      when: ansible_distribution == "Ubuntu"

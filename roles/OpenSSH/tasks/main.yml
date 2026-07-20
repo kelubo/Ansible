@@ -1,25 +1,91 @@
 ---
+# ============================================
+# SSH 服务配置任务
+# ============================================
+# 配置内容：
+# 1. SSH 会话超时参数（防止长时间闲置连接占用资源）
+# 2. SSH 登录横幅（安全警示）
+#
+# 变量来源：
+# - ssh_timeout: 从 inventory/group_vars/all.yml 读取
+#   - client_alive_interval: 服务器向客户端发送保活消息的间隔（秒）
+#   - client_alive_count_max: 服务器发送保活消息后无响应的最大次数
+#   - 实际超时时间 = client_alive_interval * client_alive_count_max
 
+# ---------------------------
+# 部署 SSH Banner 文件
+# ---------------------------
+- name: Deploy SSH banner file
+  ansible.builtin.copy:
+    src: sshd_banner
+    dest: /etc/ssh/sshd_banner
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart sshd
+  when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
+
+- name: Deploy SSH banner file - Ubuntu
+  ansible.builtin.copy:
+    src: sshd_banner
+    dest: /etc/ssh/sshd_banner
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart ssh
+  when: ansible_distribution == "Ubuntu"
+
+# ---------------------------
+# 配置 sshd_config 使用 banner
+# ---------------------------
+- name: Configure sshd_config to use banner - CentOS
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Banner\s+'
+    line: Banner /etc/ssh/sshd_banner
+    state: present
+  notify:
+    - restart sshd
+  when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
+
+- name: Configure sshd_config to use banner - Ubuntu
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Banner\s+'
+    line: Banner /etc/ssh/sshd_banner
+    state: present
+  notify:
+    - restart ssh
+  when: ansible_distribution == "Ubuntu"
+
+# ---------------------------
+# CentOS / XCP-ng / Anolis OS 配置
+# ---------------------------
 - name: SSH session timeout - CentOS
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "{{ item.regexp_string }}"
-    line: "{{ item.rule }}"
+    regexp: "{{ item.regexp_string }}"    # 正则匹配，支持已注释或未注释的行
+    line: "{{ item.rule }}"                # 替换为新的配置行
   with_items:
-    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval 600" }
-    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax 3" }
+    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval {{ ssh_timeout.client_alive_interval }}" }
+    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax {{ ssh_timeout.client_alive_count_max }}" }
   when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
   notify:
-    - restart sshd
+    - restart sshd    # 配置变更后重启 sshd 服务
 
+# ---------------------------
+# Ubuntu 配置
+# ---------------------------
 - name: SSH session timeout - Ubuntu
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "{{ item.regexp_string }}"
     line: "{{ item.rule }}"
   with_items:
-    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval 600" }
-    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax 3" }
+    - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval {{ ssh_timeout.client_alive_interval }}" }
+    - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax {{ ssh_timeout.client_alive_count_max }}" }
   when: ansible_distribution == "Ubuntu"
   notify:
-     - restart ssh
+     - restart ssh    # Ubuntu 使用 ssh 服务名

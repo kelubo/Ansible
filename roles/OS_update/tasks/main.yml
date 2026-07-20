@@ -1,5 +1,13 @@
 ---
+# ============================================
+# 系统更新任务
+# ============================================
+# 执行系统软件包更新，同时排除关键服务包以避免意外升级
+# 支持的系统：CentOS, XCP-ng, Anolis OS, Ubuntu
 
+# ---------------------------
+# CentOS / XCP-ng / Anolis OS 更新
+# ---------------------------
 - name: update cache for Yum && update all packages for CentOS | XCP-ng | Anolis OS
   block:
     - name: update cache for Yum
@@ -10,11 +18,30 @@
       ansible.builtin.yum:
         name: '*'
         state: latest
-        exclude: containerd.io,docker*,mysql*,elasticsearch,kibana,logstash,metricbeat,openscap,neo4j  
+        # 排除以下软件包，避免意外升级导致服务中断：
+        # - containerd.io, docker*: 容器运行时，升级需谨慎
+        # - mysql*: 数据库服务，升级前需备份
+        # - elasticsearch, kibana, logstash, metricbeat: ELK 堆栈，需整体升级
+        # - openscap: 安全扫描工具
+        # - neo4j: 图数据库
+        # - gitlab*: GitLab 服务，需按官方文档分步升级
+        exclude: containerd.io,docker*,mysql*,elasticsearch,kibana,logstash,metricbeat,openscap,neo4j,gitlab*  
   when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
 
+# ---------------------------
+# Ubuntu 更新
+# ---------------------------
 - name: update cache for apt && Update all packages for Ubuntu
   block:
+    # 锁定 GitLab 相关包，apt 模块不支持 exclude 参数，需先执行 hold
+    # dpkg --get-selections | grep -E "^gitlab" 列出所有 gitlab 包
+    # awk '{print $1}' 提取包名
+    # xargs -r apt-mark hold 锁定这些包（-r 避免无匹配时出错）
+    # ignore_errors: yes 允许在未安装 gitlab 时跳过此步骤
+    - name: Hold gitlab packages to prevent updates
+      ansible.builtin.shell: dpkg --get-selections | grep -E "^gitlab" | awk '{print $1}' | xargs -r apt-mark hold
+      ignore_errors: yes
+
     - name: update cache for apt
       ansible.builtin.apt:
         update_cache: yes

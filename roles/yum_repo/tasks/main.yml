@@ -1,5 +1,22 @@
 ---
+# ============================================
+# YUM 仓库配置任务
+# ============================================
+# 将内部 YUM 源配置文件部署到目标服务器
+# 模板文件位于 roles/yum_repo/templates/CentOS-Stream-release-8/
+# 使用变量 {{ local_yum_repo_url }} 替换模板中的仓库地址
+# 变量从 inventory/group_vars/all.yml 中读取
 
+# ---------------------------
+# CentOS Stream 8 仓库配置
+# ---------------------------
+# 适用于 CentOS Stream 8 版本，部署以下4个仓库配置文件：
+# - BaseOS: 基础系统包
+# - AppStream: 应用程序流包
+# - Extras: 额外包
+# - Extras-common: 额外公共包
+# 
+# backup: yes 表示在覆盖前备份原文件
 - name: Update Yum_Repo configuration for CentOS-Stream-release-8
   ansible.builtin.template:
     src: CentOS-Stream-release-8/CentOS-Stream-{{item}}.repo.j2

@@ -1,10 +1,24 @@
 ---
+# ============================================
+# Vim 编辑器配置任务
+# ============================================
+# 将自定义 Vim 配置文件部署到 root 用户目录
+# 配置文件位于 roles/Vim/files/vimrc
+# 
+# vimrc 配置内容：
+# - 显示行号
+# - 设置字体为 Lucida Console 14号
+# - 设置编码为 UTF-8
+# - YAML 文件使用 2 空格缩进
+# - 自动缩进
+# - 高亮匹配括号
+# - 搜索结果高亮
 
-- name: Vim Configure file
+- name: Copy Vim configuration file to root user
   ansible.builtin.copy:
     src: files/vimrc
     dest: /root/.vimrc
     owner: root
     group: root
     mode: '0644'
-    backup: yes
+    backup: yes    # 覆盖前备份原文件

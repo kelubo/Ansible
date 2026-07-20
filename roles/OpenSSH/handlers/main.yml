@@ -1,10 +1,19 @@
 ---
+# ============================================
+# OpenSSH 服务重启 Handler
+# ============================================
+# SSH 配置变更后需要重启服务使配置生效
+# 不同系统的服务名不同：
+# - CentOS / RHEL / XCP-ng / Anolis: sshd
+# - Ubuntu / Debian: ssh
 
+# CentOS / RHEL / XCP-ng / Anolis 系统
 - name: restart sshd
   service:
     name: sshd
     state: restarted
 
+# Ubuntu / Debian 系统
 - name: restart ssh
   service:
     name: ssh
