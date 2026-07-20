@@ -5,6 +5,7 @@
 # 配置内容：
 # 1. SSH 会话超时参数（防止长时间闲置连接占用资源）
 # 2. SSH 登录横幅（安全警示）
+# 3. MOTD（每日消息）- 登录后显示系统状态信息
 #
 # 变量来源：
 # - ssh_timeout: 从 inventory/group_vars/all.yml 读取
@@ -15,7 +16,7 @@
 # ---------------------------
 # 部署 SSH Banner 文件
 # ---------------------------
-- name: Deploy SSH banner file
+- name: Deploy SSH banner file - CentOS
   ansible.builtin.copy:
     src: sshd_banner
     dest: /etc/ssh/sshd_banner
@@ -66,14 +67,14 @@
 - name: SSH session timeout - CentOS
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
-    regexp: "{{ item.regexp_string }}"    # 正则匹配，支持已注释或未注释的行
-    line: "{{ item.rule }}"                # 替换为新的配置行
+    regexp: "{{ item.regexp_string }}"
+    line: "{{ item.rule }}"
   with_items:
     - { regexp_string: "^#* *ClientAliveInterval", rule: "ClientAliveInterval {{ ssh_timeout.client_alive_interval }}" }
     - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax {{ ssh_timeout.client_alive_count_max }}" }
   when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng"  or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
   notify:
-    - restart sshd    # 配置变更后重启 sshd 服务
+    - restart sshd
 
 # ---------------------------
 # Ubuntu 配置
@@ -88,4 +89,25 @@
     - { regexp_string: "^#* *ClientAliveCountMax", rule: "ClientAliveCountMax {{ ssh_timeout.client_alive_count_max }}" }
   when: ansible_distribution == "Ubuntu"
   notify:
-     - restart ssh    # Ubuntu 使用 ssh 服务名
+    - restart ssh
+
+# ---------------------------
+# 部署 MOTD 脚本
+# ---------------------------
+- name: Deploy MOTD script - CentOS
+  ansible.builtin.copy:
+    src: dymotd.sh
+    dest: /etc/profile.d/dymotd.sh
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "XCP-ng" or ansible_distribution == "Anolis" or ansible_distribution == "Anolis OS"
+
+- name: Deploy MOTD script - Ubuntu
+  ansible.builtin.copy:
+    src: dymotd.sh
+    dest: /etc/profile.d/dymotd.sh
+    owner: root
+    group: root
+    mode: '0644'
+  when: ansible_distribution == "Ubuntu"

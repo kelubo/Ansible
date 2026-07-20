@@ -49,14 +49,4 @@
     #  ansible.posix.selinux:
     #    state: disabled
 
-    # ---------------------------
-    # MOTD（每日消息）配置
-    # ---------------------------
-    # 用户登录后显示的欢迎信息和系统状态
-    - name: Copy profile file for motd
-      ansible.builtin.copy:
-        src: files/dymotd.sh
-        dest: /etc/profile.d/
-        owner: root
-        group: root
-        mode: '0644'
+    
